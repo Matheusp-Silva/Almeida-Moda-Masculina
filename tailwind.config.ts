@@ -8,10 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+      },
       colors: {
-        'almeida-preto': '#000000',
-        'almeida-vermelho': '#ED1C24', // Um vermelho vivo
-        'almeida-branco': '#FFFFFF',
+        "almeida-preto": "#111111",
+        "almeida-vermelho": "#E31C25",
+        "almeida-branco": "#FFFFFF",
       },
     },
   },
