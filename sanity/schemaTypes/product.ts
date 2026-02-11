@@ -11,13 +11,22 @@ export default defineType({
       name: "name",
       title: "Nome do Produto",
       type: "string",
-      validation: (Rule) => Rule.required().error("O nome do produto é obrigatório"),
+      validation: (Rule) =>
+        Rule.required().error("O nome do produto é obrigatório"),
     }),
     defineField({
       name: "price",
-      title: "Preço (R$)",
+      title: "Preço Atual (Valor Final)",
+      description: "O valor que o cliente vai pagar.",
       type: "number",
       validation: (Rule) => Rule.required().min(0),
+    }),
+    defineField({
+      name: "oldPrice",
+      title: "Preço Original (Antigo)",
+      description:
+        "Preencha APENAS se for uma OFERTA. Aparecerá riscado (ex: De R$ 100 por R$ 80).",
+      type: "number",
     }),
     defineField({
       name: "sizes",
@@ -124,11 +133,18 @@ export default defineType({
       subtitle: "category",
       media: "image",
       price: "price",
+      oldPrice: "oldPrice", // Adicione aqui
     },
-    prepare({ title, subtitle, media, price }) {
+    prepare({ title, subtitle, media, price, oldPrice }) {
+      // Mostra no painel se está em oferta
+      const priceText =
+        oldPrice && oldPrice > price
+          ? `PROMO: De R$${oldPrice} por R$${price}`
+          : `R$ ${price}`;
+
       return {
         title: title,
-        subtitle: `R$ ${price} - ${subtitle}`,
+        subtitle: `${priceText} - ${subtitle}`,
         media: media,
       };
     },
