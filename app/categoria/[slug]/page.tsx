@@ -7,13 +7,14 @@ import { MessageCircle, ArrowLeft, ShoppingBag, Menu } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-// Interface atualizada com Sizes
-interface ProductWithSizes extends Product {
+// Interface atualizada para incluir oldPrice
+interface ProductWithDetails extends Product {
   sizes?: string[];
+  oldPrice?: number;
 }
 
 export default function CategoryPage() {
-  const [products, setProducts] = useState<ProductWithSizes[]>([]);
+  const [products, setProducts] = useState<ProductWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const { slug } = params;
@@ -24,11 +25,12 @@ export default function CategoryPage() {
     if (!slug) return;
 
     async function fetchData() {
-      // ADICIONEI "sizes" NA QUERY
+      // ATUALIZAÇÃO CRUCIAL: Adicionei "oldPrice" na busca
       const query = `*[_type == "product" && category == "${slug}"] | order(_createdAt desc) {
         _id,
         name,
         price,
+        oldPrice,
         category,
         sizes, 
         "imageUrl": image.asset->url
@@ -57,6 +59,11 @@ export default function CategoryPage() {
     const parts = str.split('-');
     const name = parts.length > 1 ? parts[1] : parts[0];
     return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
+  // Função para calcular desconto
+  const calculateDiscount = (price: number, oldPrice: number) => {
+    return Math.round(((oldPrice - price) / oldPrice) * 100);
   };
 
   if (loading) {
@@ -113,6 +120,14 @@ export default function CategoryPage() {
             {products.map((product) => (
               <div key={product._id} className="group cursor-pointer flex flex-col">
                 <div className="relative w-full aspect-[4/5] bg-[#f6f6f6] mb-4 overflow-hidden rounded-sm">
+                  
+                  {/* --- NOVA LÓGICA: ETIQUETA DE DESCONTO --- */}
+                  {product.oldPrice && product.oldPrice > product.price && (
+                    <span className="absolute top-2 right-2 z-10 text-[10px] font-black uppercase bg-almeida-vermelho text-white px-3 py-1 rounded-full tracking-wider shadow-md">
+                      -{calculateDiscount(product.price, product.oldPrice)}%
+                    </span>
+                  )}
+
                   <img
                     src={product.imageUrl}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-in-out"
@@ -137,12 +152,27 @@ export default function CategoryPage() {
                       <h4 className="font-bold text-lg leading-tight uppercase tracking-tight group-hover:text-almeida-vermelho transition-colors">
                       {product.name}
                       </h4>
-                      <span className="font-bold text-lg">
-                          R$ {product.price?.toFixed(2)}
-                      </span>
+                      
+                      {/* --- NOVA LÓGICA: PREÇO RISCADO --- */}
+                      <div className="text-right">
+                        {product.oldPrice && product.oldPrice > product.price ? (
+                            <>
+                                <span className="block text-xs font-bold text-gray-400 line-through">
+                                    R$ {product.oldPrice.toFixed(2)}
+                                </span>
+                                <span className="font-bold text-lg text-almeida-vermelho">
+                                    R$ {product.price?.toFixed(2)}
+                                </span>
+                            </>
+                        ) : (
+                            <span className="font-bold text-lg">
+                                R$ {product.price?.toFixed(2)}
+                            </span>
+                        )}
+                      </div>
                   </div>
                   
-                  {/* --- AQUI ESTÁ A LISTAGEM DE TAMANHOS --- */}
+                  {/* Tamanhos */}
                   {product.sizes && product.sizes.length > 0 ? (
                     <div className="flex gap-1 mt-1 flex-wrap">
                         {product.sizes.map(size => (
