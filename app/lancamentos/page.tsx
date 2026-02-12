@@ -7,7 +7,7 @@ import { MessageCircle, ArrowLeft, ShoppingBag, Menu, Sparkles } from "lucide-re
 import Link from "next/link";
 
 // Interface estendida
-interface ProductWithDetails extends Product {
+interface ProductWithDetails extends Omit<Product, 'sizes'> {
   oldPrice?: number;
   sizes?: string[];
   _createdAt: string;

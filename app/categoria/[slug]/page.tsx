@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 // Interface atualizada para incluir oldPrice
-interface ProductWithDetails extends Product {
+interface ProductWithDetails extends Omit<Product, 'sizes'> {
   sizes?: string[];
   oldPrice?: number;
 }
