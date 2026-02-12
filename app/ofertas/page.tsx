@@ -8,7 +8,7 @@ import { MessageCircle, ArrowLeft, ShoppingBag, Menu, Tag } from "lucide-react";
 import Link from "next/link";
 
 // Interface estendida para incluir oldPrice e sizes
-interface ProductWithDetails extends Product {
+interface ProductWithDetails extends Omit<Product, 'sizes'> {
   oldPrice?: number;
   sizes?: string[];
 }
